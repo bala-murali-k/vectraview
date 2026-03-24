@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VectraView — SVG & Lottie Studio</title>
+  <link rel="icon" type="image/svg+xml" href="./public/vectraview-logo.svg" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+</head>
+<body>
+
+  <!-- Ambient background -->
+  <div class="ambient">
+    <div class="ambient__orb ambient__orb--a"></div>
+    <div class="ambient__orb ambient__orb--b"></div>
+    <div class="ambient__orb ambient__orb--c"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header__logo">
+      <svg class="header__logo-icon" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 16 L16 4 L28 16 L16 28 Z" stroke="currentColor" stroke-width="2" fill="none"/>
+        <path d="M10 16 L16 10 L22 16 L16 22 Z" fill="currentColor" opacity="0.6"/>
+        <circle cx="16" cy="16" r="3" fill="currentColor"/>
+      </svg>
+      <span class="header__logo-text">VectraView</span>
+      <span class="header__logo-badge">Studio</span>
+    </div>
+    <nav class="header__nav">
+      <span class="header__tagline">SVG &amp; Lottie Toolkit</span>
+    </nav>
+  </header>
+
+  <!-- Main layout -->
+  <main class="workspace">
+
+    <!-- LEFT PANEL: Input -->
+    <section class="panel panel--input" id="inputPanel">
+      <div class="panel__header">
+        <span class="panel__title">Input</span>
+        <div class="panel__tabs" id="inputTabs">
+          <button class="tab tab--active" data-tab="code">Code</button>
+          <button class="tab" data-tab="file">File</button>
+          <button class="tab" data-tab="lottie">Lottie</button>
+        </div>
+      </div>
+
+      <!-- Code tab -->
+      <div class="tab-content tab-content--active" id="tab-code">
+        <div class="code-editor-wrap">
+          <div class="code-editor-toolbar">
+            <span class="code-lang-badge" id="codeLangBadge">SVG</span>
+            <button class="icon-btn" id="clearCodeBtn" title="Clear">
+              <svg viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+          <textarea
+            id="codeInput"
+            class="code-editor"
+            placeholder="Paste SVG or Lottie JSON here…"
+            spellcheck="false"
+          ></textarea>
+        </div>
+        <button class="btn btn--primary btn--full" id="parseCodeBtn">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Render
+        </button>
+      </div>
+
+      <!-- File tab -->
+      <div class="tab-content" id="tab-file">
+        <div class="dropzone" id="dropzone">
+          <div class="dropzone__inner">
+            <svg class="dropzone__icon" viewBox="0 0 48 48" fill="none">
+              <rect x="6" y="6" width="36" height="36" rx="8" stroke="currentColor" stroke-width="2" stroke-dasharray="4 3"/>
+              <path d="M24 30V18M18 24l6-6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <p class="dropzone__text">Drop <strong>.svg</strong> or <strong>.json</strong> here</p>
+            <p class="dropzone__sub">or click to browse</p>
+          </div>
+          <input type="file" id="fileInput" accept=".svg,.json" hidden />
+        </div>
+        <div class="file-info hidden" id="fileInfo">
+          <div class="file-info__row">
+            <span class="file-info__name" id="fileName">—</span>
+            <span class="file-info__size" id="fileSize">—</span>
+          </div>
+          <button class="btn btn--ghost btn--sm" id="clearFileBtn">Remove</button>
+        </div>
+      </div>
+
+      <!-- Lottie tab -->
+      <div class="tab-content" id="tab-lottie">
+        <div class="lottie-url-wrap">
+          <label class="field-label">Lottie JSON URL</label>
+          <div class="field-row">
+            <input type="url" id="lottieUrl" class="field-input" placeholder="https://assets.lottiefiles.com/…" />
+            <button class="btn btn--primary" id="loadLottieBtn">Load</button>
+          </div>
+        </div>
+        <div class="lottie-divider"><span>or paste JSON in Code tab</span></div>
+        <div class="lottie-controls hidden" id="lottieControls">
+          <label class="field-label">Speed</label>
+          <div class="slider-row">
+            <input type="range" id="lottieSpeed" min="0.1" max="3" step="0.1" value="1" class="slider" />
+            <span class="slider-val" id="lottieSpeedVal">1×</span>
+          </div>
+          <div class="btn-group">
+            <button class="btn btn--ghost btn--sm" id="lottiePauseBtn">Pause</button>
+            <button class="btn btn--ghost btn--sm" id="lottieStopBtn">Stop</button>
+            <button class="btn btn--ghost btn--sm" id="lottiePlayBtn">Play</button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- CENTER PANEL: Preview -->
+    <section class="panel panel--preview" id="previewPanel">
+      <div class="panel__header">
+        <span class="panel__title">Preview</span>
+        <div class="preview-actions">
+          <button class="icon-btn" id="bgToggleBtn" title="Toggle background">
+            <svg viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" fill="currentColor" opacity="0.4"/><rect x="9" y="1" width="6" height="6" rx="1" fill="currentColor"/><rect x="1" y="9" width="6" height="6" rx="1" fill="currentColor"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor" opacity="0.4"/></svg>
+          </button>
+          <button class="icon-btn" id="zoomInBtn" title="Zoom in">
+            <svg viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M5 7h4M7 5v4M12 12l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+          <button class="icon-btn" id="zoomOutBtn" title="Zoom out">
+            <svg viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M5 7h4M12 12l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </button>
+          <button class="icon-btn" id="resetZoomBtn" title="Reset">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M3 8a5 5 0 1 1 1.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M1 6l2 2 2-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="preview-stage" id="previewStage">
+        <div class="preview-canvas" id="previewCanvas">
+          <div class="preview-empty" id="previewEmpty">
+            <svg viewBox="0 0 64 64" fill="none" class="preview-empty__icon">
+              <rect x="8" y="8" width="48" height="48" rx="10" stroke="currentColor" stroke-width="2" stroke-dasharray="5 4"/>
+              <path d="M22 32 L32 22 L42 32 L32 42 Z" stroke="currentColor" stroke-width="2" fill="none" opacity="0.5"/>
+              <circle cx="32" cy="32" r="4" fill="currentColor" opacity="0.3"/>
+            </svg>
+            <p>Nothing to preview yet</p>
+            <span>Paste code or drop a file to begin</span>
+          </div>
+          <div class="preview-render hidden" id="previewRender"></div>
+          <div class="preview-lottie hidden" id="previewLottie"></div>
+        </div>
+      </div>
+
+      <div class="preview-meta" id="previewMeta">
+        <span class="meta-tag" id="metaType">—</span>
+        <span class="meta-tag" id="metaDimensions">—</span>
+        <span class="meta-tag" id="metaSize">—</span>
+      </div>
+    </section>
+
+    <!-- RIGHT PANEL: Conversions -->
+    <section class="panel panel--conversions" id="conversionsPanel">
+      <div class="panel__header">
+        <span class="panel__title">Export</span>
+        <span class="panel__subtitle">Click any card to expand</span>
+      </div>
+
+      <div class="conversions-list" id="conversionsList">
+
+        <!-- React Component -->
+        <div class="conv-card" data-conv="react">
+          <div class="conv-card__header">
+            <div class="conv-card__icon conv-card__icon--react">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 10.11c1.03 0 1.87.84 1.87 1.89s-.84 1.87-1.87 1.87-1.87-.84-1.87-1.87.84-1.89 1.87-1.89M7.37 20c.63.38 2.01-.2 3.6-1.7-.52-.59-1.03-1.23-1.51-1.9a22.7 22.7 0 0 1-2.4-.36c-.51 2.14-.32 3.61.31 3.96m.71-5.74-.29-.51c-.11.29-.22.58-.29.86.27.06.57.11.88.16l-.3-.51m6.54-.76.81-1.5-.81-1.5c-.3-.53-.62-1-.91-1.47C13.17 9 12.6 9 12 9s-1.17 0-1.71.03c-.29.47-.61.94-.91 1.47L8.57 12l.81 1.5c.3.53.62 1 .91 1.47.54.03 1.11.03 1.71.03s1.17 0 1.71-.03c.29-.47.61-.94.91-1.47m-7.78.26c-.3-.53-.54-1.06-.72-1.57-.71.14-1.35.3-1.93.49C4.73 13.93 4 14.78 4 16a2 2 0 0 0 2 2 2 2 0 0 0 1-.27 2 2 0 0 0 1-.27c.28-.16.53-.38.72-.65-.19-.38-.37-.77-.54-1.18M16.63 20c.63-.35.82-1.82.31-3.96-.79.15-1.59.26-2.4.36-.48.67-.99 1.31-1.51 1.9 1.59 1.5 2.97 2.08 3.6 1.7M12 6.78c-.19.22-.39.45-.59.72h1.18c-.2-.27-.4-.5-.59-.72m0 10.44c.19-.22.39-.45.59-.72h-1.18c.2.27.4.5.59.72M16.62 4c-.63-.35-2.01.2-3.6 1.7.52.59 1.03 1.23 1.51 1.9.81.1 1.61.21 2.4.36.51-2.14.32-3.61-.31-3.96m-.71 5.74.3-.51c-.31-.05-.61-.1-.88-.16l.29.51.29.51c.1-.3.21-.58.3-.87l-.3.52M11.38 4c-1.59-1.5-2.97-2.08-3.6-1.7-.63.35-.82 1.82-.31 3.96a22.7 22.7 0 0 1 2.4-.36c.48-.67.99-1.31 1.51-1.9M19.1 8.44c-.58-.19-1.22-.35-1.93-.49-.18.51-.42 1.04-.72 1.57-.18.41-.36.8-.54 1.18.19.27.44.49.72.65A2 2 0 0 0 18 12a2 2 0 0 0 2-2 2 2 0 0 0 2-2c0-1.22-.73-2.07-1.93-2.5l-.97-.06m-1.35 5.56c.28.16.53.38.72.65A2 2 0 0 0 19.1 15.56c-.18-.51-.42-1.04-.72-1.57-.18-.41-.36-.8-.54-1.18.27-.06.57-.11.88-.16l-.3.51-.3.51-.3.51m-.76-3.56c.1.29.21.58.3.87l-.3-.51-.29-.51c-.31.05-.61.1-.88.16l.29.51.3.51"/></svg>
+            </div>
+            <div class="conv-card__info">
+              <span class="conv-card__name">React Component</span>
+              <span class="conv-card__desc">JSX functional component</span>
+            </div>
+            <div class="conv-card__actions">
+              <button class="pill-btn" data-action="copy" data-conv="react">Copy</button>
+              <button class="pill-btn pill-btn--dl" data-action="download" data-conv="react">↓</button>
+            </div>
+          </div>
+          <pre class="conv-card__code hidden" id="code-react"><code></code></pre>
+        </div>
+
+        <!-- React Native -->
+        <div class="conv-card" data-conv="reactnative">
+          <div class="conv-card__header">
+            <div class="conv-card__icon conv-card__icon--rn">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 10.11c1.03 0 1.87.84 1.87 1.89s-.84 1.87-1.87 1.87-1.87-.84-1.87-1.87.84-1.89 1.87-1.89M7.37 20c.63.38 2.01-.2 3.6-1.7-.52-.59-1.03-1.23-1.51-1.9a22.7 22.7 0 0 1-2.4-.36c-.51 2.14-.32 3.61.31 3.96m.71-5.74-.29-.51c-.11.29-.22.58-.29.86.27.06.57.11.88.16l-.3-.51m6.54-.76.81-1.5-.81-1.5c-.3-.53-.62-1-.91-1.47C13.17 9 12.6 9 12 9s-1.17 0-1.71.03c-.29.47-.61.94-.91 1.47L8.57 12l.81 1.5c.3.53.62 1 .91 1.47.54.03 1.11.03 1.71.03s1.17 0 1.71-.03c.29-.47.61-.94.91-1.47m-7.78.26c-.3-.53-.54-1.06-.72-1.57-.71.14-1.35.3-1.93.49C4.73 13.93 4 14.78 4 16a2 2 0 0 0 2 2 2 2 0 0 0 1-.27 2 2 0 0 0 1-.27c.28-.16.53-.38.72-.65-.19-.38-.37-.77-.54-1.18M16.63 20c.63-.35.82-1.82.31-3.96-.79.15-1.59.26-2.4.36-.48.67-.99 1.31-1.51 1.9 1.59 1.5 2.97 2.08 3.6 1.7M12 6.78c-.19.22-.39.45-.59.72h1.18c-.2-.27-.4-.5-.59-.72m0 10.44c.19-.22.39-.45.59-.72h-1.18c.2.27.4.5.59.72M16.62 4c-.63-.35-2.01.2-3.6 1.7.52.59 1.03 1.23 1.51 1.9.81.1 1.61.21 2.4.36.51-2.14.32-3.61-.31-3.96m-.71 5.74.3-.51c-.31-.05-.61-.1-.88-.16l.29.51.29.51c.1-.3.21-.58.3-.87l-.3.52M11.38 4c-1.59-1.5-2.97-2.08-3.6-1.7-.63.35-.82 1.82-.31 3.96a22.7 22.7 0 0 1 2.4-.36c.48-.67.99-1.31 1.51-1.9M19.1 8.44c-.58-.19-1.22-.35-1.93-.49-.18.51-.42 1.04-.72 1.57-.18.41-.36.8-.54 1.18.19.27.44.49.72.65A2 2 0 0 0 18 12a2 2 0 0 0 2-2 2 2 0 0 0 2-2c0-1.22-.73-2.07-1.93-2.5l-.97-.06m-1.35 5.56c.28.16.53.38.72.65A2 2 0 0 0 19.1 15.56c-.18-.51-.42-1.04-.72-1.57-.18-.41-.36-.8-.54-1.18.27-.06.57-.11.88-.16l-.3.51-.3.51-.3.51m-.76-3.56c.1.29.21.58.3.87l-.3-.51-.29-.51c-.31.05-.61.1-.88.16l.29.51.3.51"/></svg>
+            </div>
+            <div class="conv-card__info">
+              <span class="conv-card__name">React Native</span>
+              <span class="conv-card__desc">react-native-svg component</span>
+            </div>
+            <div class="conv-card__actions">
+              <button class="pill-btn" data-action="copy" data-conv="reactnative">Copy</button>
+              <button class="pill-btn pill-btn--dl" data-action="download" data-conv="reactnative">↓</button>
+            </div>
+          </div>
+          <pre class="conv-card__code hidden" id="code-reactnative"><code></code></pre>
+        </div>
+
+        <!-- HTML embed -->
+        <div class="conv-card" data-conv="html">
+          <div class="conv-card__header">
+            <div class="conv-card__icon conv-card__icon--html">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.56L16.07 16.43L16.62 10.92H9.38L9.2 8.3H16.8L17 6H7L7.56 12.29H14.45L14.22 14.83L12 15.45L9.78 14.83L9.64 13.2H7.64L7.93 16.43L12 17.56M4.07 3H19.93L18.5 19.2L12 21L5.5 19.2L4.07 3Z"/></svg>
+            </div>
+            <div class="conv-card__info">
+              <span class="conv-card__name">HTML Embed</span>
+              <span class="conv-card__desc">Inline SVG in HTML page</span>
+            </div>
+            <div class="conv-card__actions">
+              <button class="pill-btn" data-action="copy" data-conv="html">Copy</button>
+              <button class="pill-btn pill-btn--dl" data-action="download" data-conv="html">↓</button>
+            </div>
+          </div>
+          <pre class="conv-card__code hidden" id="code-html"><code></code></pre>
+        </div>
+
+        <!-- CSS Background -->
+        <div class="conv-card" data-conv="css">
+          <div class="conv-card__header">
+            <div class="conv-card__icon conv-card__icon--css">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l-.65 3.34h13.59L17.5 8.5H3.92l-.66 3.33h13.59l-.76 3.81-3.48 1.2-3.47-1.2.24-1.24H7.46l-.44 2.16 5.4 1.88 5.43-1.88.87-4.26.32-1.67.86-4.32H5z"/></svg>
+            </div>
+            <div class="conv-card__info">
+              <span class="conv-card__name">CSS Background</span>
+              <span class="conv-card__desc">background-image data URI</span>
+            </div>
+            <div class="conv-card__actions">
+              <button class="pill-btn" data-action="copy" data-conv="css">Copy</button>
+              <button class="pill-btn pill-btn--dl" data-action="download" data-conv="css">↓</button>
+            </div>
+          </div>
+          <pre class="conv-card__code hidden" id="code-css"><code></code></pre>
+        </div>
+
+        <!-- PNG -->
+        <div class="conv-card" data-conv="png">
+          <div class="conv-card__header">
+            <div class="conv-card__icon conv-card__icon--png">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="conv-card__info">
+              <span class="conv-card__name">PNG Image</span>
+              <span class="conv-card__desc">Rasterized at 2× resolution</span>
+            </div>
+            <div class="conv-card__actions">
+              <button class="pill-btn" data-action="copy" data-conv="png">Copy</button>
+              <button class="pill-btn pill-btn--dl" data-action="download" data-conv="png">↓</button>
+            </div>
+          </div>
+          <div class="conv-card__png-preview hidden" id="png-preview">
+            <img id="pngImg" alt="PNG preview" />
+          </div>
+        </div>
+
+        <!-- Data URI -->
+        <div class="conv-card" data-conv="datauri">
+          <div class="conv-card__header">
+            <div class="conv-card__icon conv-card__icon--uri">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="conv-card__info">
+              <span class="conv-card__name">Data URI</span>
+              <span class="conv-card__desc">Base64 encoded SVG</span>
+            </div>
+            <div class="conv-card__actions">
+              <button class="pill-btn" data-action="copy" data-conv="datauri">Copy</button>
+              <button class="pill-btn pill-btn--dl" data-action="download" data-conv="datauri">↓</button>
+            </div>
+          </div>
+          <pre class="conv-card__code hidden" id="code-datauri"><code></code></pre>
+        </div>
+
+        <!-- Optimized SVG -->
+        <div class="conv-card" data-conv="optimized">
+          <div class="conv-card__header">
+            <div class="conv-card__icon conv-card__icon--opt">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l2 7h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7z" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="conv-card__info">
+              <span class="conv-card__name">Optimized SVG</span>
+              <span class="conv-card__desc">Cleaned &amp; minified markup</span>
+            </div>
+            <div class="conv-card__actions">
+              <button class="pill-btn" data-action="copy" data-conv="optimized">Copy</button>
+              <button class="pill-btn pill-btn--dl" data-action="download" data-conv="optimized">↓</button>
+            </div>
+          </div>
+          <pre class="conv-card__code hidden" id="code-optimized"><code></code></pre>
+        </div>
+
+        <!-- URL encoded URI -->
+        <div class="conv-card" data-conv="urlenc">
+          <div class="conv-card__header">
+            <div class="conv-card__icon conv-card__icon--urlenc">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h4M6 14h8" stroke-linecap="round"/></svg>
+            </div>
+            <div class="conv-card__info">
+              <span class="conv-card__name">URL Encoded</span>
+              <span class="conv-card__desc">URI encoded for src attribute</span>
+            </div>
+            <div class="conv-card__actions">
+              <button class="pill-btn" data-action="copy" data-conv="urlenc">Copy</button>
+              <button class="pill-btn pill-btn--dl" data-action="download" data-conv="urlenc">↓</button>
+            </div>
+          </div>
+          <pre class="conv-card__code hidden" id="code-urlenc"><code></code></pre>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">
+    <svg viewBox="0 0 16 16" fill="none"><path d="M3 8l3 3 7-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span id="toastMsg">Copied!</span>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
